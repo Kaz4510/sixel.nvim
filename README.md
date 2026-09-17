@@ -96,6 +96,17 @@ Try it on [assets/demo.md](assets/demo.md).
   on screen in one piece is not painted.
 - Sixel is 8-bit colour with dithering. Photos look fine, gradients less so.
 
+## Made with Claude
+
+This plugin was built in [Claude Code](https://claude.com/claude-code) sessions.
+Claude did the research into how Windows Terminal handles sixel (which clear
+sequence erases images, how the PowerShell Sixel module sizes its output),
+proposed the rendering approach, wrote the Lua, and debugged the paint
+artifacts, with me steering, testing each round on Windows and WSL, and
+deciding what stayed. It also wrote this README, automated the demo
+screenshot, and handled the git commits and the push to GitHub. Every commit
+carries a `Co-Authored-By` trailer for it.
+
 ## Credits
 
 Demo photo: *The Blue Marble*, taken by the Apollo 17 crew, NASA, public domain.
