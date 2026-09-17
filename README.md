@@ -98,15 +98,15 @@ Try it on [assets/demo.md](assets/demo.md).
 
 ## Credits
 
-Written by [Rishi](https://github.com/Kaz4510) together with Claude, in
+Written by [Kaz](https://github.com/Kaz4510) together with Claude, in
 interactive [Claude Code](https://claude.com/claude-code) sessions.
 
-- **Rishi** researched the approach with Claude, wrote the Lua by hand from the
+- **Kaz** researched the approach with Claude, wrote the Lua by hand from the
   algorithm the two settled on, tested each round on Windows and WSL, and
   decided what shipped.
 - **Claude** researched how Windows Terminal handles sixel (which clear sequence
   erases images, how the PowerShell Sixel module sizes its output), worked out
-  the rendering algorithm with Rishi, helped chase the paint artifacts, and
+  the rendering algorithm with Kaz, helped chase the paint artifacts, and
   wrote this README, the demo screenshot automation, the commit messages and
   the push to GitHub. Commits carry a `Co-Authored-By` trailer for it.
 
