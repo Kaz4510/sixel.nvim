@@ -121,6 +121,11 @@ interactive [Claude Code](https://claude.com/claude-code) sessions.
   wrote this README, the demo screenshot automation, the commit messages and
   the push to GitHub. Commits carry a `Co-Authored-By` trailer for it.
 
+The page-flip reader replaced Rishi's inline renderer. Rishi chose the reader
+design (a full-screen view, pages that fill the screen, a key to open it) and
+Claude wrote its Lua and tests and tested it in Windows Terminal. The scanning,
+encoding, mermaid and URL code it builds on is still Rishi's.
+
 Demo photo: *The Blue Marble*, taken by the Apollo 17 crew, NASA, public domain.
 
 MIT license.
