@@ -4,11 +4,11 @@ Inline images in Markdown buffers, for Neovim running in Windows Terminal.
 
 ![sixel.nvim painting two images inside a markdown file in Windows Terminal](assets/demo.png)
 
-Open a `.md` file and every `![alt](image)` line gets its picture painted right
-below it, as sixel graphics. Local files, `http(s)` URLs and ```` ```mermaid ````
-blocks all work. No daemon, no Python, no multiplexer tricks: the plugin reserves
-blank virtual lines under the link and writes the sixel data straight to the
-terminal.
+Run `:SixelRead` in a markdown buffer and it opens as a full-screen reader, one
+page at a time, with every `![alt](image)` painted right below its line as sixel
+graphics. Local files, `http(s)` URLs and ```` ```mermaid ```` blocks all work.
+Flip pages instead of scrolling: a page never moves, so the terminal never has
+stale pixels to clean up. No daemon, no Python, no multiplexer tricks.
 
 ## Requirements
 
@@ -27,7 +27,11 @@ terminal.
 With [lazy.nvim](https://github.com/folke/lazy.nvim):
 
 ```lua
-{ "Kaz4510/sixel.nvim", opts = {} }
+{
+  "Kaz4510/sixel.nvim",
+  opts = {},
+  keys = { { "<leader>mr", "<cmd>SixelRead<cr>", desc = "Read markdown with images" } },
+}
 ```
 
 The defaults, and what they mean:
@@ -37,9 +41,8 @@ The defaults, and what they mean:
   "Kaz4510/sixel.nvim",
   opts = {
     cell = { w = 10, h = 20 }, -- pixel size of one terminal cell, see below
-    max_rows = 15,             -- tallest image in rows, keep it under the window height
-    max_cols = 80,             -- widest image in columns, clamped to the window width
-    debounce_ms = 150,         -- pause before repainting after a scroll
+    max_rows = 15,             -- tallest image in rows, also capped by the screen height
+    max_cols = 80,             -- widest image in columns, clamped to the screen width
     urls = true,               -- download http(s) images into the cache and render them
   },
 }
@@ -68,32 +71,40 @@ font change:
 | `![alt](https://example.com/a.png)` | Downloaded once into `stdpath("cache")/sixel`, then painted. |
 | ```` ```mermaid ```` block | Rendered with `mmdc` and painted below the closing fence. |
 
-`:SixelRefresh` drops the encode cache, re-downloads URL images and repaints. Use
-it after editing a picture on disk.
+`:SixelRead` opens the reader at the page holding the cursor line.
 
-Images hide while you are in insert mode and come back when you leave it.
+| Key | Action |
+| --- | --- |
+| `n`, `<Space>`, `<PageDown>` | Next page |
+| `p`, `<BS>`, `<PageUp>` | Previous page |
+| `q`, `<Esc>` | Back to the source, cursor on the first line of the page |
+
+`:SixelRefresh` drops the encode cache, re-downloads URL images and redraws the
+open page. Use it after editing a picture on disk.
 
 Try it on [assets/demo.md](assets/demo.md).
 
 ## How it works
 
 1. Scan the buffer for image links and mermaid fences.
-2. Encode each picture to sixel with an external process, asynchronously. Results
-   are cached per path and size.
-3. Reserve the image's height in blank virtual lines under the link, with an
-   extmark, so the text flows around the picture and the mark follows edits.
-4. After every scroll, resize or edit, compute the screen position of each
-   reserved block and write the sixel data there with `nvim_ui_send`.
-5. When a picture moves or leaves the screen, clear the terminal with `:mode`.
-   Its `ESC[2J` is the only clear Windows Terminal treats as erasing images.
+2. Encode each picture to sixel with an external process, asynchronously, sized
+   for the screen. Results are cached per path and size.
+3. Cut the document into pages: add lines (a wrapped line counts as several
+   rows, an image adds its height) until the next one would not fit the screen.
+4. Show a page in a full-screen float, with a real blank line per image row.
+   Clear the terminal with `:mode` (its `ESC[2J` is the only clear Windows
+   Terminal treats as erasing images), then write every image of the page with
+   `nvim_ui_send`. Nothing on the page ever scrolls, so nothing needs repainting
+   until the next flip, a resize or a `:` command.
 
 ## Limitations
 
 - Windows Terminal only, on purpose. The plugin checks `WT_SESSION` and stays
   dormant elsewhere, so it is safe to keep in a config shared with other
   terminals. Other sixel terminals would need a different erase strategy.
-- `max_rows` must be smaller than the window height. A picture that does not fit
-  on screen in one piece is not painted.
+- The whole document is encoded when the reader opens, so the first open of a
+  document with many images takes a moment. Later opens hit the cache.
+- The reader is for reading. Edit in the source buffer and reopen it.
 - Sixel is 8-bit colour with dithering. Photos look fine, gradients less so.
 
 ## Credits
